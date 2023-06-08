@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class Practice {
     public static void main(String[] args) {
@@ -27,13 +24,53 @@ public class Practice {
 
         boolean[] visited = new boolean[4];
         System.out.println(findPath(adjacencyList, 3, 0, visited));
+        System.out.println(findPath(adjacencyList, 3, 0));
 
 
+    }
 
+    // Нерекурсивный поиск пути
+    public static List<Integer> findPath(List<List<Integer>> graph, int start, int destination) {
+        // храним для каждой вершины её предка, чтобы потом восстановить путь
+        int[] parents = new int[graph.size()];
+        // можно обойтись предками, где -1 это false
+        boolean[] visited = new boolean[graph.size()];
+        Stack<Integer> stack = new Stack<>();
+        stack.push(start);
+        while (!stack.empty()) {
+            int current = stack.pop();
+            if (visited[current]) {
+                continue;
+            }
+            visited[current] = true;
+            if (current == destination) {
+                break;
+            }
+            for (int neighbour: graph.get(current)) {
+                if (visited[neighbour]) {
+                    continue;
+                }
+                parents[neighbour] = current;
+                stack.push(neighbour);
+            }
+        }
 
+        List<Integer> path = new ArrayList<>();
+        if (!visited[destination]) {
+            return path; // если не дошли до конца, значит пути нет, вернули пустой лист
+        }
 
+        // собираем обратно путь по предкам
+        int last = destination;
+        while (last != start) {
+            path.add(last);
+            last = parents[last];
+        }
+        path.add(start);
 
-
+        // развернуть, потому что у нас путь с конца
+        Collections.reverse(path);
+        return path;
     }
 
     // рекурсивный поиск пути
